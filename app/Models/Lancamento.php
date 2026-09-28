@@ -37,7 +37,9 @@ class Lancamento extends Model
             return 'pago';
         }
 
-        return $this->data_vencimento?->isPast() ? 'vencido' : 'pendente';
+        return $this->data_vencimento && $this->data_vencimento->lt(today())
+            ? 'vencido'
+            : 'pendente';
     }
 
     public function categoria()

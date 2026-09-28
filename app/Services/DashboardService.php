@@ -21,7 +21,7 @@ class DashboardService
             'resumo' => $this->montarResumo($lancamentos, $despesasPagas, $pendente),
             'lancamentosRecentes' => $lancamentos->take(6),
             'categorias' => $this->calcularTotaisPorCategoria($lancamentos),
-            'totalLancamentosCategorias' => $lancamentos->count(),
+            'totalLancamentosCategorias' => $this->contarDespesas($lancamentos),
             'comparativo' => [
                 'pago' => $despesasPagas,
                 'pendente' => $pendente,
@@ -63,9 +63,29 @@ class DashboardService
         $total = 0;
 
         foreach ($lancamentos as $lancamento) {
+            if (!$this->ehDespesa($lancamento)) {
+                continue;
+            }
+
             $valor = (float) $lancamento->valor;
             $valorPago = (float) ($lancamento->valor_pago ?? 0);
             $total += max(0, $valor - $valorPago);
+        }
+
+        return $total;
+    }
+
+    /**
+     * Count only expenses included in the category chart.
+     */
+    private function contarDespesas($lancamentos): int
+    {
+        $total = 0;
+
+        foreach ($lancamentos as $lancamento) {
+            if ($this->ehDespesa($lancamento)) {
+                $total++;
+            }
         }
 
         return $total;
