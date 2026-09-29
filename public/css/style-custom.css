@@ -287,6 +287,39 @@ html.dark-theme .alert-info.text-gray-500 {
   color: #d1d5db !important;
 }
 
+html.dark-theme .swal2-popup {
+  background: #1f2937 !important;
+  border: 1px solid #374151 !important;
+  color: #e5e7eb !important;
+  box-shadow: 0 16px 40px rgba(0,0,0,.4) !important;
+}
+
+html.dark-theme .swal2-title,
+html.dark-theme .swal2-html-container,
+html.dark-theme .swal2-content {
+  color: #e5e7eb !important;
+}
+
+html.dark-theme .swal2-close {
+  color: #9ca3af !important;
+}
+
+html.dark-theme .swal2-close:hover {
+  color: #fff !important;
+}
+
+html.dark-theme .swal2-timer-progress-bar {
+  background: #6b7280 !important;
+}
+
+html.dark-theme .swal2-input,
+html.dark-theme .swal2-textarea,
+html.dark-theme .swal2-select {
+  background: #111827 !important;
+  border-color: #4b5563 !important;
+  color: #e5e7eb !important;
+}
+
 html.dark-theme .form-label,
 html.dark-theme .form-check-label,
 html.dark-theme label {
@@ -388,10 +421,22 @@ html.dark-theme .dashboard-page .table th {
 html.dark-theme .form-control,
 html.dark-theme .form-select,
 html.dark-theme .select2-container--default .select2-selection--single,
-html.dark-theme .select2-container--default .select2-selection--multiple {
+html.dark-theme .select2-container--default .select2-selection--multiple,
+html.dark-theme .select2-container--bootstrap .select2-selection--single,
+html.dark-theme .select2-container--bootstrap .select2-selection--multiple {
   background-color: #111827 !important;
   border-color: #4b5563 !important;
   color: #e5e7eb !important;
+}
+
+html.dark-theme .select2-container--bootstrap .select2-selection__rendered,
+html.dark-theme .select2-container--bootstrap .select2-selection__placeholder,
+html.dark-theme .select2-container--bootstrap .select2-selection__clear {
+  color: #e5e7eb !important;
+}
+
+html.dark-theme .select2-container--bootstrap .select2-selection__placeholder {
+  opacity: .75;
 }
 
 html.dark-theme .input-group-text {
@@ -405,7 +450,9 @@ html.dark-theme .form-control::placeholder {
 }
 
 html.dark-theme .select2-dropdown,
-html.dark-theme .select2-container--default .select2-search--dropdown .select2-search__field {
+html.dark-theme .select2-container--default .select2-search--dropdown .select2-search__field,
+html.dark-theme .select2-container--bootstrap .select2-dropdown,
+html.dark-theme .select2-container--bootstrap .select2-search--dropdown .select2-search__field {
   background: #1f2937 !important;
   border-color: #4b5563 !important;
   color: #e5e7eb !important;
@@ -413,6 +460,21 @@ html.dark-theme .select2-container--default .select2-search--dropdown .select2-s
 
 html.dark-theme .select2-container--default .select2-results__option--highlighted[aria-selected] {
   background: var(--primary) !important;
+}
+
+html.dark-theme .select2-container--bootstrap .select2-results__option {
+  background: #1f2937 !important;
+  color: #e5e7eb !important;
+}
+
+html.dark-theme .select2-container--bootstrap .select2-results__option[aria-selected="true"] {
+  background: #374151 !important;
+  color: #fff !important;
+}
+
+html.dark-theme .select2-container--bootstrap .select2-results__option--highlighted[aria-selected] {
+  background: var(--primary) !important;
+  color: #fff !important;
 }
 
 .form-control:focus,
