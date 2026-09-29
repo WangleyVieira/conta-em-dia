@@ -12,11 +12,6 @@ class Categoria extends Model
 
     protected $fillable = ['descricao', 'tipo_categoria_id', 'cadastrado_por_usuario'];
 
-    public function tipoCategoria()
-    {
-        return $this->belongsTo(TipoCategoria::class);
-    }
-
     public function usuario()
     {
         return $this->belongsTo(User::class, 'cadastrado_por_usuario');

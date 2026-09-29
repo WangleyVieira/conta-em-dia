@@ -4,14 +4,20 @@
     @include('sweetalert::alert')
 
     <div class="container-fluid p-0 dashboard-page">
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="dashboard-hero d-flex justify-content-between align-items-center mb-4">
             <div>
-                <h1 class="h3 mb-1"><strong>Dashboard</strong> financeiro</h1>
-                <span class="text-muted">Visão geral de todos os cadastros</span>
+                <span class="dashboard-kicker">VISÃO GERAL</span>
+                <h1 class="h3 mb-1"><strong>Seu dinheiro</strong> em dia</h1>
+                <span class="text-muted">Acompanhe sua vida financeira em um só lugar.</span>
             </div>
-            <a href="{{ route('lancamento.create') }}" class="btn btn-success">
+            <div class="dashboard-actions d-flex align-items-center">
+                <span class="dashboard-updated d-none d-md-inline-flex">
+                    <i class="fas fa-calendar-check mr-2"></i> {{ now()->format('d/m/Y') }}
+                </span>
+                <a href="{{ route('lancamento.create') }}" class="btn btn-success">
                 <i class="fas fa-plus-square"></i> Novo lançamento
-            </a>
+                </a>
+            </div>
         </div>
 
         <div class="row mb-4">
@@ -25,13 +31,22 @@
             @endphp
             @foreach ($cards as $card)
                 <div class="col-12 col-sm-6 col-xl-3 mb-3">
-                    <div class="card border-0 shadow-sm h-100" style="border-radius: 18px;">
+                    <div class="card dashboard-kpi-card h-100">
                         <div class="card-body">
                             <div class="d-flex align-items-center justify-content-between mb-3">
                                 <small class="text-muted">{{ $card['label'] }}</small>
-                                <span class="text-{{ $card['color'] }}"><i class="fas {{ $card['icon'] }}"></i></span>
+                                <span class="dashboard-kpi-icon dashboard-kpi-icon-{{ $card['color'] }}"><i class="fas {{ $card['icon'] }}"></i></span>
                             </div>
-                            <h3 class="mb-0 text-{{ $card['color'] }}">R$ {{ number_format((float) $card['value'], 2, ',', '.') }}</h3>
+                            <h3 class="mb-1 text-{{ $card['color'] }}">R$ {{ number_format((float) $card['value'], 2, ',', '.') }}</h3>
+                            <small class="text-muted">
+                                @if ($card['label'] === 'Pendente total')
+                                    Acompanhe seus próximos pagamentos
+                                @elseif ($card['label'] === 'Saldo total')
+                                    Receitas menos despesas pagas
+                                @else
+                                    Acumulado dos seus cadastros
+                                @endif
+                            </small>
                         </div>
                     </div>
                 </div>
@@ -43,13 +58,13 @@
                 <div class="card h-100">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="card-title mb-0">Despesas por categoria</h5>
-                        <span class="text-muted small">Todos os cadastros ({{ $totalLancamentosCategorias }} lançamentos)</span>
+                        <span class="text-muted small">{{ $totalLancamentosCategorias }} {{ $totalLancamentosCategorias === 1 ? 'lançamento' : 'lançamentos' }}</span>
                     </div>
                     <div class="card-body">
                         @if ($categorias->isEmpty())
                             <p class="text-muted text-center py-5 mb-0">Ainda não há despesas cadastradas.</p>
                         @else
-                            <div style="height: 280px;"><canvas id="graficoCategorias"></canvas></div>
+                            <div class="dashboard-chart dashboard-chart-category"><canvas id="graficoCategorias"></canvas></div>
                             <div class="table-responsive mt-3">
                                 <table class="table table-sm mb-0">
                                     <thead>
@@ -74,9 +89,12 @@
             </div>
             <div class="col-xl-4 mb-4">
                 <div class="card h-100">
-                    <div class="card-header"><h5 class="card-title mb-0">Comparativo de despesas</h5></div>
+                    <div class="card-header">
+                        <h5 class="card-title mb-1">Comparativo de despesas</h5>
+                        <small class="text-muted">Pago x pendente</small>
+                    </div>
                     <div class="card-body d-flex flex-column justify-content-center">
-                        <div style="height: 280px;"><canvas id="graficoComparativo"></canvas></div>
+                        <div class="dashboard-chart dashboard-chart-comparison"><canvas id="graficoComparativo"></canvas></div>
                     </div>
                 </div>
             </div>
@@ -88,7 +106,7 @@
                 <a href="{{ route('lancamento.index') }}" class="btn btn-sm btn-outline-primary">Ver todos</a>
             </div>
             <div class="table-responsive">
-                <table class="table table-hover mb-0">
+                <table class="table table-hover mb-0 dashboard-recent-table">
                     <thead style="background-color:#e2e7e6">
                         <tr><th>Descrição</th><th>Categoria</th><th>Vencimento</th><th>Valor</th><th>Situação</th></tr>
                     </thead>
@@ -96,7 +114,7 @@
                         @forelse ($lancamentosRecentes as $lancamento)
                             @php($classesSituacao = ['pago' => 'success', 'pendente' => 'secondary', 'vencido' => 'danger'])
                             <tr>
-                                <td>{{ $lancamento->descricao }}</td>
+                                <td class="font-weight-bold">{{ $lancamento->descricao }}</td>
                                 <td>{{ $lancamento->categoria?->descricao ?? '-' }}</td>
                                 <td>{{ $lancamento->data_vencimento?->format('d/m/Y') ?? '-' }}</td>
                                 <td>R$ {{ number_format((float) $lancamento->valor, 2, ',', '.') }}</td>
