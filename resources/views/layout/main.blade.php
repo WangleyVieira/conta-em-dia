@@ -110,7 +110,29 @@
 
                     <div class="navbar-collapse collapse">
                         <ul class="navbar-nav navbar-align">
-                            <li class="nav-item">
+                            <li class="nav-item currency-quote-item">
+                                <div id="cotacao-dolar" class="currency-quote" data-url="{{ route('cotacao.dolar') }}"
+                                    role="status" aria-live="polite" title="Cotação comercial do dólar via AwesomeAPI">
+                                    <i class="fas fa-dollar-sign currency-quote-icon" aria-hidden="true"></i>
+                                    <span class="currency-quote-content">
+                                        <span class="currency-quote-label">Dólar comercial</span>
+                                        <strong id="cotacao-dolar-valor">Carregando...</strong>
+                                        <small id="cotacao-dolar-detalhe">Atualização automática</small>
+                                    </span>
+                                </div>
+                            </li>
+                            <li class="nav-item currency-quote-item">
+                                <div class="currency-quote currency-quote-minimum"
+                                    title="Salário mínimo nacional vigente em {{ config('services.salario_minimo.ano_vigencia') }}">
+                                    <i class="fas fa-coins currency-quote-icon" aria-hidden="true"></i>
+                                    <span class="currency-quote-content">
+                                        <span class="currency-quote-label">Salário mínimo · {{ config('services.salario_minimo.ano_vigencia') }}</span>
+                                        <strong>R$ {{ number_format(config('services.salario_minimo.valor'), 2, ',', '.') }}</strong>
+                                        <small>Valor nacional vigente</small>
+                                    </span>
+                                </div>
+                            </li>
+                            <li class="nav-item topbar-theme-item">
                                 <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Aplicar tema escuro"
                                     title="Aplicar tema escuro">
                                     <i class="fas fa-moon"></i>
@@ -163,6 +185,73 @@
         <script src="{{ url('js/fontawesome.js') }}"></script>
         <script src="{{ url('js/functions.js') }}"></script>
         <script src="{{ url('js/prevent_multiple_submits.js') }}"></script>
+        <script>
+            (function () {
+                var cotacao = document.getElementById('cotacao-dolar');
+
+                if (!cotacao) {
+                    return;
+                }
+
+                var valor = document.getElementById('cotacao-dolar-valor');
+                var detalhe = document.getElementById('cotacao-dolar-detalhe');
+                var formatoMoeda = new Intl.NumberFormat('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL'
+                });
+                var atualizando = false;
+
+                function atualizarCotacao() {
+                    if (atualizando || document.hidden) {
+                        return;
+                    }
+
+                    atualizando = true;
+
+                    fetch(cotacao.dataset.url, {
+                        headers: { 'Accept': 'application/json' },
+                        credentials: 'same-origin'
+                    })
+                        .then(function (resposta) {
+                            if (!resposta.ok) {
+                                throw new Error('Não foi possível consultar a cotação.');
+                            }
+
+                            return resposta.json();
+                        })
+                        .then(function (dados) {
+                            var compra = Number(dados.compra);
+                            var venda = Number(dados.venda);
+                            var variacao = Number(dados.variacao);
+                            var dataAtualizacao = new Date(Number(dados.atualizadoEm) * 1000);
+
+                            if (!Number.isFinite(compra) || !Number.isFinite(venda) || !Number.isFinite(variacao) || Number.isNaN(dataAtualizacao.getTime())) {
+                                throw new Error('A cotação recebida é inválida.');
+                            }
+
+                            valor.textContent = formatoMoeda.format(compra);
+                            detalhe.textContent = 'Venda ' + formatoMoeda.format(venda) + ' · ' + (variacao > 0 ? '+' : '') + variacao.toFixed(2).replace('.', ',') + '%';
+                            cotacao.title = 'Atualizada em ' + new Intl.DateTimeFormat('pt-BR', {
+                                dateStyle: 'short',
+                                timeStyle: 'short'
+                            }).format(dataAtualizacao) + ' · Fonte: AwesomeAPI';
+                            cotacao.classList.remove('currency-quote-unavailable');
+                        })
+                        .catch(function () {
+                            valor.textContent = 'Indisponível';
+                            detalhe.textContent = 'Tentaremos atualizar novamente';
+                            cotacao.classList.add('currency-quote-unavailable');
+                        })
+                        .finally(function () {
+                            atualizando = false;
+                        });
+                }
+
+                atualizarCotacao();
+                window.setInterval(atualizarCotacao, 60000);
+                document.addEventListener('visibilitychange', atualizarCotacao);
+            }());
+        </script>
         <script>
             (function () {
                 var html = document.documentElement;

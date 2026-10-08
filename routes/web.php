@@ -2,10 +2,12 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\CategoriaController;
+use App\Http\Controllers\CotacaoDolarController;
 use App\Http\Controllers\EntradaSalarioController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AuditoriaController;
 use App\Http\Controllers\LancamentoController;
+use App\Http\Controllers\OrcamentoController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\RelatorioController;
 use App\Http\Controllers\UserController;
