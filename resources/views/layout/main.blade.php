@@ -70,11 +70,11 @@
                             Controle
                         </li>
 
-                        {{-- <li class="sidebar-item">
-                            <a class="sidebar-link" href="maps-google.html">
+                        <li class="sidebar-item {{ Request::is('relatorios*') ? 'active' : '' }}">
+                            <a class="sidebar-link" href="{{ route('relatorio.index') }}">
                                 <i class="align-middle fas fa-chart-bar"></i> <span class="align-middle">Relatórios</span>
                             </a>
-                        </li> --}}
+                        </li>
 
                         <li class="sidebar-item {{ Request::is('auditoria*') ? 'active' : '' }}">
                                 <a class="sidebar-link" href="{{ route('auditoria.index') }}">
