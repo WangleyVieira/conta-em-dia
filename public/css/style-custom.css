@@ -59,6 +59,63 @@ html.dark-theme body {
   font-weight: 700;
 }
 
+.currency-quote {
+  display: flex;
+  align-items: center;
+  gap: .7rem;
+  min-width: 212px;
+  padding: .4rem .8rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--card);
+  color: var(--text);
+}
+
+.currency-quote-item + .currency-quote-item {
+  margin-left: .5rem;
+}
+
+.topbar-theme-item {
+  margin-left: .75rem;
+}
+
+.currency-quote-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: rgba(5,150,105,.1);
+  color: var(--success);
+  font-size: 1.05rem;
+}
+
+.currency-quote-content {
+  display: grid;
+  line-height: 1.25;
+}
+
+.currency-quote-label,
+.currency-quote-content small {
+  color: var(--muted);
+  font-size: .65rem;
+}
+
+.currency-quote-content strong {
+  font-size: .85rem;
+  font-weight: 800;
+}
+
+.currency-quote-unavailable .currency-quote-icon,
+.currency-quote-unavailable .currency-quote-content strong {
+  color: var(--danger);
+}
+
+.currency-quote-unavailable .currency-quote-icon {
+  background: rgba(220,38,38,.1);
+}
+
 .dashboard-kpi-card {
   position: relative;
   overflow: hidden;
@@ -118,6 +175,16 @@ html.dark-theme .dashboard-kpi-icon-primary { background: rgba(37,99,235,.18); }
 
 @media (max-width: 575.98px) {
   .content { padding: 1rem !important; }
+  .currency-quote {
+    min-width: 0;
+    gap: .4rem;
+    padding: .3rem .4rem;
+    border: 0;
+    background: transparent;
+  }
+  .currency-quote-icon { width: 30px; height: 30px; }
+  .currency-quote-label { display: none; }
+  .currency-quote-content small { font-size: .58rem; }
   .dashboard-hero { align-items: flex-start !important; flex-direction: column; gap: 1rem; }
   .dashboard-actions { width: 100%; }
   .dashboard-actions .btn { width: 100%; }

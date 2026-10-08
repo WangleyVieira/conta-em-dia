@@ -35,4 +35,13 @@ return [
         ],
     ],
 
+    'cotacao_dolar' => [
+        'ca_bundle' => env('COTACAO_DOLAR_CA_BUNDLE'),
+    ],
+
+    'salario_minimo' => [
+        'valor' => 1621.00,
+        'ano_vigencia' => 2026,
+    ],
+
 ];
