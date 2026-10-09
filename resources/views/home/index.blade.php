@@ -51,6 +51,72 @@
                     </div>
                 </div>
             @endforeach
+
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="card-title mb-1">Orçamento mensal</h5>
+                    <small class="text-muted">
+                        {{ $orcamentoMensal['mesSelecionado']->translatedFormat('F Y') }} · aviso aos 80%; ultrapassado acima de 100%
+                    </small>
+                </div>
+                <a href="{{ route('orcamento.index', ['mes' => $orcamentoMensal['mesSelecionado']->format('Y-m')]) }}"
+                    class="btn btn-sm btn-outline-primary">Gerenciar</a>
+            </div>
+            <div class="card-body">
+                @if ($orcamentoMensal['orcamentos']->isEmpty())
+                    <p class="text-muted mb-0">
+                        Nenhum limite definido para este mês.
+                        <a href="{{ route('orcamento.index') }}">Configure seus orçamentos por categoria.</a>
+                    </p>
+                @else
+                    <div class="row">
+                        @foreach ($orcamentoMensal['orcamentos'] as $orcamento)
+                            @php
+                                $corOrcamento = match ($orcamento['status']) {
+                                    'excedido' => 'danger',
+                                    'utilizado', 'alerta' => 'warning',
+                                    default => 'success',
+                                };
+                            @endphp
+                            <div class="col-12 col-md-6 col-xl-4 mb-3">
+                                <div class="budget-summary-item">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <strong>{{ $orcamento['categoria'] }}</strong>
+                                        <span class="badge badge-{{ $corOrcamento }}">
+                                            @if ($orcamento['status'] === 'excedido')
+                                                Limite ultrapassado
+                                            @elseif ($orcamento['status'] === 'utilizado')
+                                                Limite utilizado
+                                            @elseif ($orcamento['status'] === 'alerta')
+                                                Próximo do limite
+                                            @else
+                                                Dentro do limite
+                                            @endif
+                                        </span>
+                                    </div>
+                                    <div class="d-flex justify-content-between small text-muted mb-1">
+                                        <span>Gasto: R$ {{ number_format($orcamento['gasto'], 2, ',', '.') }}</span>
+                                        <span>Limite: R$ {{ number_format($orcamento['limite'], 2, ',', '.') }}</span>
+                                    </div>
+                                    <div class="progress budget-progress" role="progressbar"
+                                        aria-label="Uso do orçamento de {{ $orcamento['categoria'] }}"
+                                        aria-valuenow="{{ min(100, round($orcamento['percentual'])) }}"
+                                        aria-valuemin="0" aria-valuemax="100">
+                                        <div class="progress-bar bg-{{ $corOrcamento }}"
+                                            style="width: {{ $orcamento['percentualBarra'] }}%"></div>
+                                    </div>
+                                    <small class="text-muted">
+                                        {{ number_format($orcamento['percentual'], 1, ',', '.') }}% utilizado
+                                    </small>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
         </div>
 
         <div class="row">

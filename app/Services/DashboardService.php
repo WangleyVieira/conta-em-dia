@@ -7,6 +7,10 @@ use App\Models\Lancamento;
 
 class DashboardService
 {
+    public function __construct(private readonly OrcamentoService $orcamentoService)
+    {
+    }
+
     /**
      * Get the data for the dashboard.
      */
@@ -15,6 +19,7 @@ class DashboardService
         $lancamentos = $this->buscarLancamentos();
         $despesasPagas = $this->calcularDespesasPagas($lancamentos);
         $pendente = $this->calcularValorPendente($lancamentos);
+        $orcamentoMensal = $this->orcamentoService->getDashboardData(now()->format('m/Y'));
 
         return [
             'competenciaAtual' => 'todos os cadastros',
@@ -26,6 +31,7 @@ class DashboardService
                 'pago' => $despesasPagas,
                 'pendente' => $pendente,
             ],
+            'orcamentoMensal' => $orcamentoMensal,
         ];
     }
 

@@ -19,7 +19,11 @@ Route::post('/autenticacao', [LoginController::class, 'autenticacao'])->name('lo
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
     Route::get('/dashboard', [HomeController::class, 'index'])->name('dashboard');
+    Route::get('/cotacao/dolar', [CotacaoDolarController::class, 'show'])->name('cotacao.dolar');
     Route::get('/relatorios', [RelatorioController::class, 'index'])->name('relatorio.index');
+    Route::get('/orcamentos', [OrcamentoController::class, 'index'])->name('orcamento.index');
+    Route::post('/orcamentos', [OrcamentoController::class, 'store'])->name('orcamento.store');
+    Route::delete('/orcamentos/{orcamento}', [OrcamentoController::class, 'destroy'])->name('orcamento.destroy');
     Route::get('/auditoria', [AuditoriaController::class, 'index'])->name('auditoria.index');
     Route::get('/perfil', [PerfilController::class, 'edit'])->name('perfil.edit');
     Route::put('/perfil/{id}', [PerfilController::class, 'update'])->name('perfil.update');
