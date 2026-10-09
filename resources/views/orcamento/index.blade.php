@@ -29,7 +29,8 @@
                     <input type="hidden" name="competencia" value="{{ $competencia }}">
                     <div class="form-group col-md-5">
                         <label for="categoria_id">Categoria</label>
-                        <select id="categoria_id" name="categoria_id" class="form-control select2 @error('categoria_id') is-invalid @enderror" required>
+                        <select id="categoria_id" name="categoria_id" class="form-control select2 @error('categoria_id') is-invalid @enderror"
+                            @disabled($categoriasDisponiveis->isEmpty()) required>
                             <option value="">Selecione uma categoria</option>
                             @foreach ($categoriasDisponiveis as $categoria)
                                 <option value="{{ $categoria->id }}" @selected(old('categoria_id') == $categoria->id)>
@@ -40,6 +41,9 @@
                         @error('categoria_id')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
+                        @if ($categoriasDisponiveis->isEmpty())
+                            <small class="form-text text-muted">Todas as categorias já têm limite nesta competência.</small>
+                        @endif
                     </div>
                     <div class="form-group col-md-4">
                         <label for="valor_limite">Limite mensal (R$)</label>
@@ -55,7 +59,7 @@
                         @enderror
                     </div>
                     <div class="form-group col-md-3">
-                        <button type="submit" class="btn btn-success mb-0">
+                        <button type="submit" class="btn btn-success mb-0" @disabled($categoriasDisponiveis->isEmpty())>
                             <i class="fas fa-save mr-1"></i> Salvar limite
                         </button>
                     </div>

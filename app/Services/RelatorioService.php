@@ -42,6 +42,13 @@ class RelatorioService
             $salariosAnteriores
         );
 
+        $categorias = $this->montarComparativoCategorias(
+            $lancamentos->get($competencia, collect()),
+            $lancamentosAnteriores,
+            $competencia,
+            $competenciaAnterior
+        );
+
         return [
             'competencia' => $competencia,
             'mesSelecionado' => $mesSelecionado,
@@ -52,12 +59,8 @@ class RelatorioService
                 'despesas' => $this->calcularVariacao($resumoAtual['despesas'], $resumoAnterior['despesas']),
                 'saldo' => $this->calcularVariacao($resumoAtual['saldo'], $resumoAnterior['saldo']),
             ],
-            'categorias' => $this->montarComparativoCategorias(
-                $lancamentos->get($competencia, collect()),
-                $lancamentosAnteriores,
-                $competencia,
-                $competenciaAnterior
-            ),
+            'categorias' => $categorias,
+            'graficoCategorias' => $this->montarGraficoCategorias($categorias),
             'evolucao' => $resumosMensais->map(fn (array $mes, string $competenciaMes): array => [
                 'mes' => Carbon::createFromFormat('!m/Y', $competenciaMes)->translatedFormat('M/y'),
                 'receitas' => $mes['receitas'],
@@ -77,10 +80,11 @@ class RelatorioService
         foreach ($lancamentos as $lancamento) {
             if ($lancamento->tipo === 'receita') {
                 $receitas += (float) $lancamento->valor;
+
                 continue;
             }
 
-            if (!in_array($lancamento->tipo, ['despesa', 'gasto'], true)) {
+            if (! in_array($lancamento->tipo, ['despesa', 'gasto'], true)) {
                 continue;
             }
 
@@ -105,8 +109,7 @@ class RelatorioService
         Collection $lancamentosAnterior,
         string $competencia,
         string $competenciaAnterior
-    ): Collection
-    {
+    ): Collection {
         $totais = collect([$lancamentosAtual, $lancamentosAnterior])
             ->flatten()
             ->filter(fn (Lancamento $lancamento): bool => in_array($lancamento->tipo, ['despesa', 'gasto'], true))
@@ -121,6 +124,27 @@ class RelatorioService
             ]);
 
         return $totais->sortByDesc('atual');
+    }
+
+    private function montarGraficoCategorias(Collection $categorias): array
+    {
+        $principais = $categorias->take(5);
+        $outras = $categorias->slice(5);
+        $labels = $principais->keys()->values();
+        $atual = $principais->pluck('atual')->map(fn ($valor): float => (float) $valor)->values();
+        $anterior = $principais->pluck('anterior')->map(fn ($valor): float => (float) $valor)->values();
+
+        if ($outras->isNotEmpty()) {
+            $labels->push('Outras');
+            $atual->push((float) $outras->sum('atual'));
+            $anterior->push((float) $outras->sum('anterior'));
+        }
+
+        return [
+            'labels' => $labels,
+            'atual' => $atual,
+            'anterior' => $anterior,
+        ];
     }
 
     private function calcularVariacao(float $atual, float $anterior): ?float

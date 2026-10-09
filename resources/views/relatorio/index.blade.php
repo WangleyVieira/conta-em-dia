@@ -97,10 +97,29 @@
             </div>
         </div>
 
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-1">Despesas por categoria</h5>
+                <small class="text-muted">Compare os gastos da competência selecionada com o mês anterior</small>
+            </div>
+            <div class="card-body">
+                @if (count($graficoCategorias['labels']) > 0)
+                    <div class="report-chart report-chart-categories"
+                        style="height: {{ max(240, count($graficoCategorias['labels']) * 48) }}px">
+                        <canvas id="graficoCategoriasComparativo"
+                            aria-label="Comparativo de despesas por categoria entre a competência selecionada e o mês anterior"
+                            role="img"></canvas>
+                    </div>
+                @else
+                    <p class="text-center text-muted mb-0 py-4">Não há despesas nessas competências para comparar.</p>
+                @endif
+            </div>
+        </div>
+
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <div>
-                    <h5 class="card-title mb-1">Despesas por categoria</h5>
+                    <h5 class="card-title mb-1">Detalhamento por categoria</h5>
                     <small class="text-muted">Comparativo com o mês anterior</small>
                 </div>
             </div>
@@ -143,6 +162,13 @@
             var corTexto = temaEscuro ? '#9ca3af' : '#64748b';
             var corGrade = temaEscuro ? '#374151' : '#e5e7eb';
             var evolucao = @json($evolucao);
+            var graficoCategorias = @json($graficoCategorias);
+            var formatoMoeda = new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
 
             new Chart(document.getElementById('graficoEvolucao'), {
                 type: 'bar',
@@ -157,8 +183,23 @@
                 options: {
                     maintainAspectRatio: false,
                     legend: { labels: { fontColor: corTexto } },
+                    tooltips: {
+                        callbacks: {
+                            label: function (tooltipItem, data) {
+                                var nome = data.datasets[tooltipItem.datasetIndex].label || '';
+                                return (nome ? nome + ': ' : '') + formatoMoeda.format(tooltipItem.yLabel);
+                            }
+                        }
+                    },
                     scales: {
-                        yAxes: [{ ticks: { beginAtZero: true, fontColor: corTexto }, gridLines: { color: corGrade } }],
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true,
+                                fontColor: corTexto,
+                                callback: function (valor) { return formatoMoeda.format(valor); }
+                            },
+                            gridLines: { color: corGrade }
+                        }],
                         xAxes: [{ ticks: { fontColor: corTexto }, gridLines: { display: false } }]
                     }
                 }
@@ -173,9 +214,68 @@
                 options: {
                     maintainAspectRatio: false,
                     legend: { position: 'bottom', labels: { fontColor: corTexto } },
-                    cutoutPercentage: 68
+                    cutoutPercentage: 68,
+                    tooltips: {
+                        callbacks: {
+                            label: function (tooltipItem, data) {
+                                var dataset = data.datasets[tooltipItem.datasetIndex];
+                                var nome = data.labels[tooltipItem.index] || '';
+                                return (nome ? nome + ': ' : '') + formatoMoeda.format(dataset.data[tooltipItem.index]);
+                            }
+                        }
+                    }
                 }
             });
+
+            var categoriasCanvas = document.getElementById('graficoCategoriasComparativo');
+            if (categoriasCanvas) {
+                new Chart(categoriasCanvas, {
+                    type: 'horizontalBar',
+                    data: {
+                        labels: graficoCategorias.labels,
+                        datasets: [
+                            {
+                                label: '{{ ucfirst($mesSelecionado->translatedFormat('F Y')) }}',
+                                data: graficoCategorias.atual,
+                                backgroundColor: '#4f46e5',
+                                borderRadius: 5
+                            },
+                            {
+                                label: '{{ ucfirst($mesSelecionado->copy()->subMonth()->translatedFormat('F Y')) }}',
+                                data: graficoCategorias.anterior,
+                                backgroundColor: '#94a3b8',
+                                borderRadius: 5
+                            }
+                        ]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        legend: { position: 'bottom', labels: { fontColor: corTexto } },
+                        tooltips: {
+                            callbacks: {
+                                label: function (tooltipItem, data) {
+                                    var nome = data.datasets[tooltipItem.datasetIndex].label || '';
+                                    return (nome ? nome + ': ' : '') + formatoMoeda.format(tooltipItem.xLabel);
+                                }
+                            }
+                        },
+                        scales: {
+                            xAxes: [{
+                                ticks: {
+                                    beginAtZero: true,
+                                    fontColor: corTexto,
+                                    callback: function (valor) { return formatoMoeda.format(valor); }
+                                },
+                                gridLines: { color: corGrade }
+                            }],
+                            yAxes: [{
+                                ticks: { fontColor: corTexto },
+                                gridLines: { display: false }
+                            }]
+                        }
+                    }
+                });
+            }
         });
     </script>
 @endsection

@@ -78,14 +78,9 @@ body {
 .banner-logo-icon {
     width: 48px;
     height: 48px;
-    background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    flex: 0 0 48px;
     border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.4rem;
-    box-shadow: 0 8px 24px rgba(245, 158, 11, 0.4);
-    animation: pulse-glow 3s ease-in-out infinite;
+    object-fit: contain;
 }
 
 @keyframes pulse-glow {

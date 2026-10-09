@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Categoria;
 use App\Models\EntradaSalario;
 use App\Models\Lancamento;
+use App\Models\User;
 use App\Services\LancamentoService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
@@ -78,5 +79,40 @@ class LancamentoServiceTest extends TestCase
         );
 
         $this->assertSame(80.0, (float) $dados['resumo']['pendente']);
+    }
+
+    public function test_tela_de_lancamentos_filtra_por_mes_selecionado(): void
+    {
+        $categoria = Categoria::create(['descricao' => 'Moradia']);
+        $usuario = User::create([
+            'name' => 'Pessoa Usuária',
+            'email' => 'lancamentos-filtro@example.com',
+            'password' => 'senha-segura',
+        ]);
+
+        Lancamento::create([
+            'tipo' => 'despesa',
+            'competencia' => '09/2026',
+            'descricao' => 'Despesa de setembro',
+            'valor' => 100,
+            'valor_pago' => 0,
+            'categoria_id' => $categoria->id,
+        ]);
+        Lancamento::create([
+            'tipo' => 'despesa',
+            'competencia' => '10/2026',
+            'descricao' => 'Despesa de outubro',
+            'valor' => 200,
+            'valor_pago' => 0,
+            'categoria_id' => $categoria->id,
+        ]);
+
+        $this->actingAs($usuario)
+            ->get(route('lancamento.index', ['mes' => '2026-09']))
+            ->assertOk()
+            ->assertSee('Despesa de setembro')
+            ->assertDontSee('Despesa de outubro')
+            ->assertSee('value="2026-09"', false)
+            ->assertSee('R$ 100,00');
     }
 }

@@ -75,6 +75,22 @@ html.dark-theme body {
   white-space: nowrap;
 }
 
+.lancamento-page-header { gap: 1rem; }
+
+.lancamento-page-actions {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+}
+
+.lancamento-new-entry {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: .45rem;
+  white-space: nowrap;
+}
+
 .dashboard-updated {
   align-items: center;
   color: var(--muted);
@@ -241,6 +257,7 @@ html.dark-theme .report-month-filter:focus-within {
 .report-period-label .text-muted { margin-left: .35rem; font-weight: 400; }
 .report-chart { position: relative; width: 100%; height: 320px; }
 .report-chart-doughnut { height: 210px; }
+.report-chart-categories { min-height: 240px; }
 .report-expense-summary { display: grid; gap: .85rem; }
 .report-expense-summary > div { display: grid; grid-template-columns: 12px 1fr auto; align-items: center; gap: .55rem; }
 .report-summary-dot { width: 10px; height: 10px; border-radius: 50%; }
@@ -271,6 +288,11 @@ html.dark-theme .dashboard-kpi-icon-primary { background: rgba(37,99,235,.18); }
   .dashboard-actions .report-month-filter .btn { width: auto; }
   .report-month-filter { width: 100%; }
   .report-month-filter input[type="month"] { min-width: 0; flex: 1; }
+  .lancamento-page-header { align-items: flex-start !important; flex-direction: column; }
+  .lancamento-page-actions { width: 100%; align-items: stretch; flex-direction: column; }
+  .lancamento-page-actions .report-month-filter { width: 100%; }
+  .lancamento-page-actions .report-month-filter input[type="month"] { min-width: 0; flex: 1; }
+  .lancamento-new-entry { width: 100%; }
   .report-period-label .text-muted { display: block; margin: .25rem 0 0 1.5rem; }
   .dashboard-chart-category,
   .dashboard-chart-comparison,
@@ -289,19 +311,33 @@ html.dark-theme .dashboard-page {
 }
 
 .sidebar,
-.sidebar.js-sidebar,
+.sidebar.js-sidebar {
+  background: linear-gradient(180deg, var(--sidebar) 0%, var(--sidebar-2) 100%) !important;
+}
+
 .sidebar-content,
 .sidebar-content.js-simplebar,
 .sidebar-content .simplebar-content,
 .sidebar-content .simplebar-content-wrapper,
 .sidebar-content .simplebar-mask,
 .sidebar-content .simplebar-offset {
-  background: linear-gradient(180deg, var(--sidebar) 0%, var(--sidebar-2) 100%) !important;
+  background: transparent !important;
 }
 
 .sidebar-brand {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: .65rem;
   padding: 1.25rem 1.25rem 1rem !important;
   border-bottom: 1px solid rgba(255,255,255,.08) !important;
+}
+
+.sidebar-brand-logo {
+  display: block;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
 }
 
 .sidebar-brand .align-middle {
@@ -337,7 +373,7 @@ html.dark-theme .dashboard-page {
 
 .sidebar-link:hover {
   color: #fff !important;
-  background: rgba(255,255,255,.08) !important;
+  background-color: transparent !important;
 }
 
 .navbar.navbar-bg {

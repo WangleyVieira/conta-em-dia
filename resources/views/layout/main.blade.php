@@ -8,6 +8,7 @@
 
         <title>Conta em dia</title>
         <meta name="description" content="Sistema de controle financeiro pessoal — gerencie lançamentos, categorias e mais.">
+        <link rel="icon" type="image/svg+xml" href="{{ asset('img/conta-em-dia-logo.svg') }}">
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="{{ asset('css/bootstrap.css') }}">
         <link rel="stylesheet" href="{{ asset('css/fontawesome.css') }}">
@@ -29,7 +30,8 @@
         <div class="wrapper">
             <nav id="sidebar" class="sidebar js-sidebar">
                 <div class="sidebar-content js-simplebar">
-                    <a class="sidebar-brand" href="index.html">
+                    <a class="sidebar-brand" href="{{ route('dashboard') }}">
+                        <img src="{{ asset('img/conta-em-dia-logo.svg') }}" alt="" class="sidebar-brand-logo">
                         <span class="align-middle">Conta em dia</span>
                     </a>
 
