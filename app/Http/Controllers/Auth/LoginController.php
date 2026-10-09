@@ -76,7 +76,7 @@ class LoginController extends Controller
         Alert::toast('Login realizado com sucesso.', 'success');
 
         // Redireciona para página pretendida (ou dashboard, se não houver).
-        return redirect()->intended(route('lancamento.index'));
+        return redirect()->intended(route('dashboard'));
     }
 
     public function logout(Request $request)

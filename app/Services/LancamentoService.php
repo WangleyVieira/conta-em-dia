@@ -100,20 +100,24 @@ class LancamentoService
             }
 
             $totalPago += $valorPago;
-            $totalPendente += max(0, $valorPrevisto - $valorPago);
+
+            if ($this->lancamentoEhDespesa($lancamento) && $lancamento->situacao === 'pendente') {
+                $totalPendente += max(0, $valorPrevisto - $valorPago);
+            }
         }
 
         $competenciaDoSalario = $this->definirCompetenciaDoSalario($competencia);
+        $salarioDaCompetencia = (float) EntradaSalario::query()
+            ->where('competencia', $competenciaDoSalario)
+            ->sum('valor_salario');
 
         return [
             'receitas' => $totalReceitas,
             'despesas' => $totalDespesas,
             'pago' => $totalPago,
             'pendente' => $totalPendente,
-            'saldo_entrada_salario' => EntradaSalario::query()
-                ->where('competencia', $competenciaDoSalario)
-                ->sum('valor_salario'),
-            'saldo' => $totalReceitas - $totalDespesas,
+            'saldo_entrada_salario' => $salarioDaCompetencia,
+            'saldo' => $salarioDaCompetencia - $totalDespesas,
         ];
     }
 
