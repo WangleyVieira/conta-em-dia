@@ -3,15 +3,25 @@
 @section('content')
     @include('sweetalert::alert')
 
-    <div class="card" style="background-color:white">
-        <div class="card-header d-flex justify-content-between align-items-center">
+    <div class="card lancamento-page" style="background-color:white">
+        <div class="card-header lancamento-page-header d-flex justify-content-between align-items-center">
             <div>
-                <h4 class="mb-0">Controle mensal</h4>
-                <small class="text-muted">Histórico de receitas, despesas e pagamentos</small>
+                <h4 class="mb-0">Lançamentos</h4>
+                <small class="text-muted">Receitas, despesas e pagamentos de {{ ucfirst($mesSelecionado->translatedFormat('F Y')) }}</small>
             </div>
-            <a class="btn btn-success" href="{{ route('lancamento.create') }}">
-                <i class="fas fa-plus-square"></i> Novo lançamento
-            </a>
+            <div class="lancamento-page-actions">
+                <form method="GET" action="{{ route('lancamento.index') }}" class="report-month-filter">
+                    <label for="mes" class="sr-only">Mês dos lançamentos</label>
+                    <input type="month" id="mes" name="mes" class="form-control" value="{{ $mesSelecionado->format('Y-m') }}">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-filter mr-1" aria-hidden="true"></i> Aplicar
+                    </button>
+                </form>
+                <a class="btn btn-success lancamento-new-entry" href="{{ route('lancamento.create') }}">
+                    <i class="fas fa-plus-square" aria-hidden="true"></i>
+                    <span>Novo lançamento</span>
+                </a>
+            </div>
         </div>
 
         <div class="card-body">
@@ -76,7 +86,9 @@
 
             @if ($lancamentos->isEmpty())
                 <div>
-                    <h1 class="alert-info px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Não há cadastros no sistema.</h1>
+                    <h1 class="alert-info px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
+                        Não há lançamentos para {{ $mesSelecionado->translatedFormat('F Y') }}.
+                    </h1>
                 </div>
             @else
                 <div class="table-responsive">

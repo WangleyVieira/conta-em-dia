@@ -209,6 +209,12 @@
             var temaEscuro = document.documentElement.classList.contains('dark-theme');
             var corTextoGrafico = temaEscuro ? '#9ca3af' : '#64748b';
             var corGradeGrafico = temaEscuro ? '#374151' : '#e5e7eb';
+            var formatoMoeda = new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
             var categoriaCanvas = document.getElementById('graficoCategorias');
             if (categoriaCanvas) {
                 new Chart(categoriaCanvas, {
@@ -226,6 +232,15 @@
                         legend: {
                             position: 'bottom',
                             labels: { fontColor: corTextoGrafico }
+                        },
+                        tooltips: {
+                            callbacks: {
+                                label: function (tooltipItem, data) {
+                                    var nome = data.labels[tooltipItem.index] || '';
+                                    var valor = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+                                    return (nome ? nome + ': ' : '') + formatoMoeda.format(valor);
+                                }
+                            }
                         }
                     }
                 });
@@ -244,9 +259,21 @@
                 options: {
                     maintainAspectRatio: false,
                     legend: { display: false },
+                    tooltips: {
+                        callbacks: {
+                            label: function (tooltipItem, data) {
+                                var nome = data.datasets[tooltipItem.datasetIndex].label || data.labels[tooltipItem.index] || '';
+                                return (nome ? nome + ': ' : '') + formatoMoeda.format(tooltipItem.yLabel);
+                            }
+                        }
+                    },
                     scales: {
                         yAxes: [{
-                            ticks: { beginAtZero: true, fontColor: corTextoGrafico },
+                            ticks: {
+                                beginAtZero: true,
+                                fontColor: corTextoGrafico,
+                                callback: function (valor) { return formatoMoeda.format(valor); }
+                            },
                             gridLines: { color: corGradeGrafico }
                         }],
                         xAxes: [{

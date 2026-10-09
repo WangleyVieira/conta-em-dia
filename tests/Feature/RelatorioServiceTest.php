@@ -90,6 +90,39 @@ class RelatorioServiceTest extends TestCase
             ->assertSee('Despesas por categoria');
     }
 
+    public function test_relatorio_prepara_grafico_com_cinco_maiores_categorias_e_agrupa_demais(): void
+    {
+        $categorias = collect();
+        foreach ([
+            'Moradia' => 600,
+            'Transporte' => 500,
+            'Alimentação' => 400,
+            'Saúde' => 300,
+            'Lazer' => 200,
+            'Educação' => 100,
+        ] as $descricao => $valor) {
+            $categoria = Categoria::create(['descricao' => $descricao]);
+            $categorias->put($descricao, $categoria);
+            $this->criarLancamento($categoria, [
+                'competencia' => '09/2026',
+                'valor' => $valor,
+            ]);
+            $this->criarLancamento($categoria, [
+                'competencia' => '08/2026',
+                'valor' => $valor / 2,
+            ]);
+        }
+
+        $grafico = app(RelatorioService::class)->getData('09/2026')['graficoCategorias'];
+
+        $this->assertSame(
+            ['Moradia', 'Transporte', 'Alimentação', 'Saúde', 'Lazer', 'Outras'],
+            $grafico['labels']->all()
+        );
+        $this->assertSame([600.0, 500.0, 400.0, 300.0, 200.0, 100.0], $grafico['atual']->all());
+        $this->assertSame([300.0, 250.0, 200.0, 150.0, 100.0, 50.0], $grafico['anterior']->all());
+    }
+
     private function criarLancamento(Categoria $categoria, array $dados): Lancamento
     {
         return Lancamento::create(array_merge([

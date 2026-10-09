@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\EntradaSalario;
 use App\Models\Lancamento;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
@@ -14,7 +15,7 @@ class LancamentoService
      */
     public function getIndexData(Request $request): array
     {
-        $competencia = $request->input('competencia');
+        $competencia = $request->input('competencia') ?: now()->format('m/Y');
         $situacao = $request->input('situacao');
         $competencias = $this->listarCompetencias();
         $lancamentos = $this->listarLancamentos($competencia);
@@ -24,6 +25,7 @@ class LancamentoService
         return [
             'lancamentos' => $lancamentos,
             'competencia' => $competencia,
+            'mesSelecionado' => Carbon::createFromFormat('!m/Y', $competencia),
             'situacao' => $situacao,
             'resumo' => $resumo,
             'competencias' => $competencias,
@@ -60,7 +62,7 @@ class LancamentoService
      */
     private function filtrarPorSituacao(Collection $lancamentos, ?string $situacao): Collection
     {
-        if (!$situacao) {
+        if (! $situacao) {
             return $lancamentos;
         }
 

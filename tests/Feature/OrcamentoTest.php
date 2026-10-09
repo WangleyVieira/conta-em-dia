@@ -145,6 +145,30 @@ class OrcamentoTest extends TestCase
             ->assertSee('Limite ultrapassado');
     }
 
+    public function test_seletor_mostra_somente_categorias_sem_limite_na_competencia(): void
+    {
+        $categoriaComLimite = Categoria::create(['descricao' => 'Moradia']);
+        $categoriaDisponivel = Categoria::create(['descricao' => 'Transporte']);
+        $categoriaComLimiteEmOutroMes = Categoria::create(['descricao' => 'Lazer']);
+        Orcamento::create([
+            'categoria_id' => $categoriaComLimite->id,
+            'competencia' => '10/2026',
+            'valor_limite' => 1000,
+        ]);
+        Orcamento::create([
+            'categoria_id' => $categoriaComLimiteEmOutroMes->id,
+            'competencia' => '09/2026',
+            'valor_limite' => 500,
+        ]);
+
+        $this->actingAs($this->criarUsuario('orcamento-categorias-disponiveis@example.com'))
+            ->get(route('orcamento.index', ['mes' => '2026-10']))
+            ->assertOk()
+            ->assertDontSee('<option value="'.$categoriaComLimite->id.'"', false)
+            ->assertSee('<option value="'.$categoriaDisponivel->id.'"', false)
+            ->assertSee('<option value="'.$categoriaComLimiteEmOutroMes->id.'"', false);
+    }
+
     public function test_orcamento_exige_categoria_e_valor_valido(): void
     {
         $usuario = $this->criarUsuario('orcamento-validacao@example.com');

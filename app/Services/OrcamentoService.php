@@ -41,10 +41,18 @@ class OrcamentoService
                 ];
             });
 
+        $categoriasDisponiveis = Categoria::query()
+            ->when(
+                $orcamentos->isNotEmpty(),
+                fn ($query) => $query->whereNotIn('id', $orcamentos->pluck('categoriaId'))
+            )
+            ->orderBy('descricao')
+            ->get(['id', 'descricao']);
+
         return [
             'competencia' => $competencia,
             'mesSelecionado' => Carbon::createFromFormat('!m/Y', $competencia),
-            'categoriasDisponiveis' => Categoria::query()->orderBy('descricao')->get(['id', 'descricao']),
+            'categoriasDisponiveis' => $categoriasDisponiveis,
             'orcamentos' => $orcamentos,
         ];
     }
