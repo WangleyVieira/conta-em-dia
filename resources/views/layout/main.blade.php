@@ -66,6 +66,12 @@
                             </a>
                         </li>
 
+                        <li class="sidebar-item {{ Request::is('orcamentos*') ? 'active' : '' }}">
+                            <a class="sidebar-link" href="{{ route('orcamento.index') }}">
+                                <i class="align-middle fas fa-bullseye"></i> <span class="align-middle">Orçamentos</span>
+                            </a>
+                        </li>
+
                         <li class="sidebar-header">
                             Controle
                         </li>
