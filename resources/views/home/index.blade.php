@@ -6,16 +6,22 @@
     <div class="container-fluid p-0 dashboard-page">
         <div class="dashboard-hero d-flex justify-content-between align-items-center mb-4">
             <div>
-                <span class="dashboard-kicker">VISÃO GERAL</span>
+                <span class="dashboard-kicker">VISÃO GERAL · {{ \Carbon\Carbon::createFromFormat('!m/Y', $competencia)->translatedFormat('F Y') }}</span>
                 <h1 class="h3 mb-1"><strong>Seu dinheiro</strong> em dia</h1>
-                <span class="text-muted">Acompanhe sua vida financeira em um só lugar.</span>
+                <span class="text-muted">Acompanhe sua vida financeira nesta competência.</span>
             </div>
             <div class="dashboard-actions d-flex align-items-center">
-                <span class="dashboard-updated d-none d-md-inline-flex">
-                    <i class="fas fa-calendar-check mr-2"></i> {{ now()->format('d/m/Y') }}
-                </span>
-                <a href="{{ route('lancamento.create') }}" class="btn btn-success">
-                <i class="fas fa-plus-square"></i> Novo lançamento
+                <form method="GET" action="{{ route('dashboard') }}" class="report-month-filter">
+                    <label for="mes" class="sr-only">Competência do dashboard</label>
+                    <input type="month" id="mes" name="mes" class="form-control"
+                        value="{{ \Carbon\Carbon::createFromFormat('!m/Y', $competencia)->format('Y-m') }}">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-filter mr-1"></i> Aplicar
+                    </button>
+                </form>
+                <a href="{{ route('lancamento.create') }}" class="btn btn-success dashboard-new-entry">
+                    <i class="fas fa-plus-square" aria-hidden="true"></i>
+                    <span>Novo lançamento</span>
                 </a>
             </div>
         </div>
@@ -23,10 +29,10 @@
         <div class="row mb-4">
             @php
                 $cards = [
-                    ['label' => 'Despesas totais', 'value' => $resumo['despesas'], 'color' => 'danger', 'icon' => 'fa-arrow-down'],
-                    ['label' => 'Pendente total', 'value' => $resumo['pendente'], 'color' => 'warning', 'icon' => 'fa-clock'],
-                    ['label' => 'Saldo total', 'value' => $resumo['saldo'], 'color' => $resumo['saldo'] < 0 ? 'danger' : 'success', 'icon' => 'fa-wallet'],
-                    ['label' => 'Salários totais', 'value' => $resumo['salario'], 'color' => 'primary', 'icon' => 'fa-money-bill-wave'],
+                    ['label' => 'Despesas da competência', 'value' => $resumo['despesas'], 'color' => 'danger', 'icon' => 'fa-arrow-down'],
+                    ['label' => 'Pendente da competência', 'value' => $resumo['pendente'], 'color' => 'warning', 'icon' => 'fa-clock'],
+                    ['label' => 'Saldo da competência', 'value' => $resumo['saldo'], 'color' => $resumo['saldo'] < 0 ? 'danger' : 'success', 'icon' => 'fa-wallet'],
+                    ['label' => 'Salário da competência', 'value' => $resumo['salario'], 'color' => 'primary', 'icon' => 'fa-money-bill-wave'],
                 ];
             @endphp
             @foreach ($cards as $card)
@@ -39,12 +45,12 @@
                             </div>
                             <h3 class="mb-1 text-{{ $card['color'] }}">R$ {{ number_format((float) $card['value'], 2, ',', '.') }}</h3>
                             <small class="text-muted">
-                                @if ($card['label'] === 'Pendente total')
+                                @if ($card['label'] === 'Pendente da competência')
                                     Acompanhe seus próximos pagamentos
-                                @elseif ($card['label'] === 'Saldo total')
+                                @elseif ($card['label'] === 'Saldo da competência')
                                     Receitas menos despesas pagas
                                 @else
-                                    Acumulado dos seus cadastros
+                                    Referente a {{ \Carbon\Carbon::createFromFormat('!m/Y', $competencia)->translatedFormat('F Y') }}
                                 @endif
                             </small>
                         </div>
@@ -69,7 +75,7 @@
                 @if ($orcamentoMensal['orcamentos']->isEmpty())
                     <p class="text-muted mb-0">
                         Nenhum limite definido para este mês.
-                        <a href="{{ route('orcamento.index') }}">Configure seus orçamentos por categoria.</a>
+                        <a href="{{ route('orcamento.index', ['mes' => \Carbon\Carbon::createFromFormat('!m/Y', $competencia)->format('Y-m')]) }}">Configure seus orçamentos por categoria.</a>
                     </p>
                 @else
                     <div class="row">
@@ -168,8 +174,8 @@
 
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="card-title mb-0">Lançamentos recentes</h5>
-                <a href="{{ route('lancamento.index') }}" class="btn btn-sm btn-outline-primary">Ver todos</a>
+                <h5 class="card-title mb-0">Lançamentos de {{ \Carbon\Carbon::createFromFormat('!m/Y', $competencia)->translatedFormat('F Y') }}</h5>
+                <a href="{{ route('lancamento.index', ['competencia' => $competencia]) }}" class="btn btn-sm btn-outline-primary">Ver todos</a>
             </div>
             <div class="table-responsive">
                 <table class="table table-hover mb-0 dashboard-recent-table">

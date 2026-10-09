@@ -52,6 +52,29 @@ html.dark-theme body {
 
 .dashboard-actions { gap: 1rem; }
 
+.dashboard-actions .report-month-filter {
+  flex: 0 1 340px;
+}
+
+.dashboard-actions .report-month-filter input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.dashboard-actions .report-month-filter .btn {
+  flex: 0 0 auto;
+  width: auto;
+  white-space: nowrap;
+}
+
+.dashboard-new-entry {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: .45rem;
+  white-space: nowrap;
+}
+
 .dashboard-updated {
   align-items: center;
   color: var(--muted);
@@ -159,10 +182,61 @@ html.dark-theme body {
 .report-month-filter {
   display: flex;
   align-items: center;
-  gap: .6rem;
+  gap: .35rem;
+  padding: .3rem;
+  border: 1px solid rgba(148, 163, 184, .28);
+  border-radius: 14px;
+  background: var(--card);
+  box-shadow: 0 8px 22px rgba(15, 23, 42, .08);
+  transition: border-color .18s ease, box-shadow .18s ease;
 }
 
-.report-month-filter input { min-width: 175px; }
+.report-month-filter:focus-within {
+  border-color: rgba(37, 99, 235, .55);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, .1), 0 10px 24px rgba(15, 23, 42, .1);
+}
+
+.budget-page .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.report-month-filter input[type="month"] {
+  min-width: 175px;
+  min-height: 42px;
+  border: 0 !important;
+  border-radius: 10px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--text);
+  font-size: .88rem;
+  font-weight: 700;
+}
+
+.report-month-filter input[type="month"]:focus {
+  outline: none;
+  box-shadow: none !important;
+}
+
+.report-month-filter .btn {
+  min-height: 42px;
+  padding: .55rem 1rem;
+  border-radius: 10px !important;
+  white-space: nowrap;
+}
+
+html.dark-theme .report-month-filter {
+  border-color: rgba(148, 163, 184, .16);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, .18);
+}
+
+html.dark-theme .report-month-filter:focus-within {
+  border-color: rgba(96, 165, 250, .6);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, .18), 0 10px 24px rgba(0, 0, 0, .22);
+}
+
 .report-period-label { font-weight: 600; }
 .report-period-label .text-muted { margin-left: .35rem; font-weight: 400; }
 .report-chart { position: relative; width: 100%; height: 320px; }
@@ -191,11 +265,12 @@ html.dark-theme .dashboard-kpi-icon-primary { background: rgba(37,99,235,.18); }
   .currency-quote-label { display: none; }
   .currency-quote-content small { font-size: .58rem; }
   .dashboard-hero { align-items: flex-start !important; flex-direction: column; gap: 1rem; }
-  .dashboard-actions { width: 100%; }
+  .dashboard-actions { width: 100%; align-items: stretch !important; flex-direction: column; }
+  .dashboard-actions .report-month-filter { width: 100%; flex: 0 0 auto; }
   .dashboard-actions .btn { width: 100%; }
+  .dashboard-actions .report-month-filter .btn { width: auto; }
   .report-month-filter { width: 100%; }
-  .report-month-filter input { min-width: 0; flex: 1; }
-  .report-month-filter .btn { white-space: nowrap; }
+  .report-month-filter input[type="month"] { min-width: 0; flex: 1; }
   .report-period-label .text-muted { display: block; margin: .25rem 0 0 1.5rem; }
   .dashboard-chart-category,
   .dashboard-chart-comparison,

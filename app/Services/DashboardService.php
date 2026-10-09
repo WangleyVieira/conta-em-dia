@@ -4,26 +4,29 @@ namespace App\Services;
 
 use App\Models\EntradaSalario;
 use App\Models\Lancamento;
+use App\Models\Orcamento;
+use Carbon\Carbon;
+use Illuminate\Support\Collection;
 
 class DashboardService
 {
-    public function __construct(private readonly OrcamentoService $orcamentoService)
-    {
-    }
+    public function __construct(private readonly OrcamentoService $orcamentoService) {}
 
     /**
      * Get the data for the dashboard.
      */
-    public function getData(): array
+    public function getData(?string $competencia = null): array
     {
-        $lancamentos = $this->buscarLancamentos();
+        $competencia ??= now()->format('m/Y');
+        $lancamentos = $this->buscarLancamentos($competencia);
         $despesasPagas = $this->calcularDespesasPagas($lancamentos);
         $pendente = $this->calcularValorPendente($lancamentos);
-        $orcamentoMensal = $this->orcamentoService->getDashboardData(now()->format('m/Y'));
+        $orcamentoMensal = $this->orcamentoService->getDashboardData($competencia);
 
         return [
-            'competenciaAtual' => 'todos os cadastros',
-            'resumo' => $this->montarResumo($lancamentos, $despesasPagas, $pendente),
+            'competencia' => $competencia,
+            'competenciasDisponiveis' => $this->listarCompetenciasDisponiveis($competencia),
+            'resumo' => $this->montarResumo($lancamentos, $despesasPagas, $pendente, $competencia),
             'lancamentosRecentes' => $lancamentos->take(6),
             'categorias' => $this->calcularTotaisPorCategoria($lancamentos),
             'totalLancamentosCategorias' => $this->contarDespesas($lancamentos),
@@ -36,13 +39,26 @@ class DashboardService
     }
 
     /**
-     * Fetch all lancamentos with their associated categories, ordered by creation date descending.
+     * Fetch lancamentos for the selected competencia, ordered by creation date descending.
      */
-    private function buscarLancamentos()
+    private function buscarLancamentos(string $competencia): Collection
     {
         return Lancamento::with('categoria')
+            ->where('competencia', $competencia)
             ->orderByDesc('created_at')
             ->get();
+    }
+
+    private function listarCompetenciasDisponiveis(string $competenciaAtual): Collection
+    {
+        return collect()
+            ->merge(Lancamento::query()->select('competencia')->distinct()->pluck('competencia'))
+            ->merge(EntradaSalario::query()->select('competencia')->distinct()->pluck('competencia'))
+            ->merge(Orcamento::query()->select('competencia')->distinct()->pluck('competencia'))
+            ->push($competenciaAtual)
+            ->unique()
+            ->sortByDesc(fn (string $mes): int => Carbon::createFromFormat('!m/Y', $mes)->getTimestamp())
+            ->values();
     }
 
     /**
@@ -62,20 +78,22 @@ class DashboardService
     }
 
     /**
-     * Calculate the total pending amount for all lancamentos.
+     * Calculate the unpaid amount for expenses that are still pending.
      */
     private function calcularValorPendente($lancamentos): float
     {
         $total = 0;
 
         foreach ($lancamentos as $lancamento) {
-            if (!$this->ehDespesa($lancamento)) {
+            if (! $this->ehDespesa($lancamento)) {
                 continue;
             }
 
             $valor = (float) $lancamento->valor;
             $valorPago = (float) ($lancamento->valor_pago ?? 0);
-            $total += max(0, $valor - $valorPago);
+            if ($lancamento->situacao === 'pendente') {
+                $total += max(0, $valor - $valorPago);
+            }
         }
 
         return $total;
@@ -105,7 +123,7 @@ class DashboardService
         $totais = [];
 
         foreach ($lancamentos as $lancamento) {
-            if (!$this->ehDespesa($lancamento)) {
+            if (! $this->ehDespesa($lancamento)) {
                 continue;
             }
 
@@ -119,10 +137,14 @@ class DashboardService
     }
 
     /**
-     * Mount the summary data for the dashboard, including total expenses, pending amounts, balance, salary, and total lancamentos.
+     * Mount the summary data for the selected dashboard competencia.
      */
-    private function montarResumo($lancamentos, float $despesasPagas, float $pendente): array
-    {
+    private function montarResumo(
+        Collection $lancamentos,
+        float $despesasPagas,
+        float $pendente,
+        string $competencia
+    ): array {
         $receitas = 0;
 
         foreach ($lancamentos as $lancamento) {
@@ -135,7 +157,9 @@ class DashboardService
             'despesas' => $despesasPagas,
             'pendente' => $pendente,
             'saldo' => $receitas - $despesasPagas,
-            'salario' => (float) EntradaSalario::sum('valor_salario'),
+            'salario' => (float) EntradaSalario::query()
+                ->where('competencia', $competencia)
+                ->sum('valor_salario'),
             'lancamentos' => $lancamentos->count(),
         ];
     }

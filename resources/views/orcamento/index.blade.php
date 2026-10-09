@@ -3,7 +3,7 @@
 @section('content')
     @include('sweetalert::alert')
 
-    <div class="container-fluid p-0">
+    <div class="container-fluid p-0 budget-page">
         <div class="dashboard-hero d-flex justify-content-between align-items-center mb-4">
             <div>
                 <span class="dashboard-kicker">PLANEJAMENTO FINANCEIRO</span>
